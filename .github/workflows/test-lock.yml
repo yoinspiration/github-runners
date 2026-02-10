@@ -3,7 +3,7 @@ name: test-lock
 on: workflow_dispatch
 jobs:
   hold-lock:
-    runs-on: [self-hosted, phytiumpi, roc-rk3568-pc]
+    runs-on: [self-hosted]
     steps:
       - name: Long step (hold lock)
         run: |
