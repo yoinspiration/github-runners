@@ -1,0 +1,12 @@
+# 用于实测 runner-wrapper 锁：手触发后由板子 runner 接 job，持锁期间 restart 验证锁释放
+name: test-lock
+on: workflow_dispatch
+jobs:
+  hold-lock:
+    runs-on: [self-hosted, phytiumpi, roc-rk3568-pc]
+    steps:
+      - name: Long step (hold lock)
+        run: |
+          echo "Job started at $(date -Iseconds)"
+          sleep 90
+          echo "Job finished at $(date -Iseconds)"
