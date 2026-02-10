@@ -33,6 +33,15 @@ export RUNNER_SCRIPT=/home/runner/run.sh
 | `RUNNER_SCRIPT` | `/home/runner/run.sh` | 实际 Runner 脚本路径 |
 | `RUNNER_LOCK_DIR` | `/tmp/github-runner-locks` | 锁文件目录 |
 
+## 与 runner.sh 的配合（锁的释放）
+
+通过 `./runner.sh restart`、`./runner.sh stop` 等操作重启或停止容器时：
+
+- **锁会随进程退出而释放**：锁由 pre-job 钩子中创建的子进程通过 `flock` 持有；容器被停止或重启时，该进程会随之退出，内核会关闭文件描述符并释放 flock，不会造成锁长期占用。
+- **Runner 正在跑 job 时重启**：当前 job 会失败，但容器退出后锁会立即释放，其他等待同一 `RUNNER_RESOURCE_ID` 的 Runner 可以继续获取锁执行 job。
+
+建议将锁目录放在**本地盘**；若使用 NFS 等网络文件系统，需确认其对 flock 语义的支持，以免异常退出时锁释放延迟。
+
 ## 依赖
 
 - `flock`（通常随 util-linux 提供）
